@@ -1,43 +1,19 @@
 import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import * as THREE from "three";
-
-const theme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: {
-      main: "#3f51b5",
-    },
-    background: {
-      default: "#121212",
-      paper: "#1e1e1e",
-    },
-  },
-});
 
 export default function SignUp() {
   const navigate = useNavigate();
-  const canvasRef = React.useRef(null); // Reference for Three.js canvas
+  const canvasRef = React.useRef(null);
   const [formData, setFormData] = React.useState({
     fullName: "",
     email: "",
     password: "",
-    receiveUpdates: false,
   });
 
   React.useEffect(() => {
-    // Set up Three.js scene
+    // Setup Three.js scene
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -50,16 +26,13 @@ export default function SignUp() {
 
     // Create a starry sky using particles (stars)
     const starGeometry = new THREE.BufferGeometry();
-    const starMaterial = new THREE.PointsMaterial({
-      color: 0xffffff,
-      size: 0.1,
-    });
-
+    const starCount = 5000;
     const starVertices = [];
-    for (let i = 0; i < 10000; i++) {
-      const x = (Math.random() - 0.5) * 2000;
-      const y = (Math.random() - 0.5) * 2000;
-      const z = -Math.random() * 2000;
+
+    for (let i = 0; i < starCount; i++) {
+      const x = THREE.MathUtils.randFloatSpread(2000);
+      const y = THREE.MathUtils.randFloatSpread(2000);
+      const z = THREE.MathUtils.randFloatSpread(2000);
       starVertices.push(x, y, z);
     }
 
@@ -67,40 +40,40 @@ export default function SignUp() {
       "position",
       new THREE.Float32BufferAttribute(starVertices, 3)
     );
+
+    const starMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.5,
+    });
+
     const stars = new THREE.Points(starGeometry, starMaterial);
     scene.add(stars);
 
-    // Set camera position
-    camera.position.z = 5;
+    camera.position.z = 1;
 
-    // Animation loop
-    const animate = () => {
+    const animate = function () {
       requestAnimationFrame(animate);
-      stars.rotation.y += 0.0002;
+      stars.rotation.x += 0.0005;
+      stars.rotation.y += 0.0005;
       renderer.render(scene, camera);
     };
+
     animate();
 
-    // Handle window resize
+    // Handle resize
     const handleResize = () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener("resize", handleResize);
-
-    // Cleanup
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleChange = (e) => {
-    const value =
-      e.target.type === "checkbox" ? e.target.checked : e.target.value;
     setFormData({
       ...formData,
-      [e.target.name]: value,
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -112,116 +85,106 @@ export default function SignUp() {
         formData
       );
       if (response.status === 201) {
-        navigate("/signin");
+        navigate("/Home");
       }
     } catch (error) {
-      console.error("Error during signup", error);
+      console.error(
+        "Error during signup",
+        error.response?.data?.message || error.message
+      );
     }
   };
 
+  // Function to navigate to the home page when clicking the logo
+  const handleLogoClick = () => {
+    navigate("/");
+  };
+
   return (
-    <ThemeProvider theme={theme}>
-      <div className="relative h-screen w-full overflow-hidden">
-        {/* Three.js canvas */}
-        <canvas ref={canvasRef} className="absolute inset-0 z-0" />
-
-        <Container component="main" maxWidth="xs" className="relative z-10">
-          <CssBaseline />
-          <Box
-            sx={{
-              marginTop: 8,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              bgcolor: "background.paper",
-              p: 4,
-              borderRadius: 2,
-            }}
-          >
-            {/* Replace Avatar with the Planetary Capital logo */}
-            <Link href="/" variant="body2">
-              <Avatar
-                sx={{ m: 1, width: 80, height: 80 }}
-                src="/Planetary Capital.png"
-                alt="Planetary Capital Logo"
-              />
-            </Link>
-
-            <Typography component="h1" variant="h5" sx={{ mb: 3 }}>
-              Sign up
-            </Typography>
-            <Box
-              component="form"
-              noValidate
-              onSubmit={handleSubmit}
-              sx={{ mt: 3 }}
-            >
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    autoComplete="name"
-                    name="fullName"
-                    required
-                    fullWidth
-                    id="fullName"
-                    label="Full name"
-                    autoFocus
-                    value={formData.fullName}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    id="email"
-                    label="Email"
-                    name="email"
-                    autoComplete="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    required
-                    fullWidth
-                    name="password"
-                    label="Password"
-                    type="password"
-                    id="password"
-                    autoComplete="new-password"
-                    value={formData.password}
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item xs={12}></Grid>
-              </Grid>
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+    <div className="relative h-screen w-full overflow-hidden bg-gray-900">
+      <canvas ref={canvasRef} className="absolute inset-0 z-0" />
+      <div className="relative z-10 flex items-center justify-center h-full">
+        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+          <div className="flex justify-center">
+            <img
+              className="w-20 h-20 cursor-pointer"
+              src="/Planetary Capital.png"
+              alt="Planetary Capital Logo"
+              onClick={handleLogoClick}
+            />
+          </div>
+          <h2 className="text-center text-2xl font-bold text-gray-800 my-4">
+            Sign Up
+          </h2>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-gray-700"
               >
-                Sign up
-              </Button>
-              <Grid container justifyContent="center">
-                <Grid item>
-                  <Link href="/signIn" variant="body2">
-                    Already have an account? Sign in
-                  </Link>
-                </Grid>
-              </Grid>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                align="center"
-                sx={{ mt: 2 }}
-              ></Typography>
-            </Box>
-          </Box>
-        </Container>
+                Full Name
+              </label>
+              <input
+                id="fullName"
+                name="fullName"
+                type="text"
+                required
+                value={formData.fullName}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              Sign Up
+            </button>
+            <div className="text-center mt-4">
+              <a
+                href="/SignIn"
+                className="text-sm text-indigo-600 hover:underline"
+              >
+                Already have an account? Sign in
+              </a>
+            </div>
+          </form>
+        </div>
       </div>
-    </ThemeProvider>
+    </div>
   );
 }

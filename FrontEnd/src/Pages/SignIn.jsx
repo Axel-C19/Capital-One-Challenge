@@ -1,31 +1,7 @@
 import * as React from "react";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Google } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import EarthSignIn from "../Components/threeJsComponents/earthSignIn";
-
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: {
-      main: "#3f51b5",
-    },
-    background: {
-      default: "#0a0a0a",
-      paper: "#121212",
-    },
-  },
-});
+import axios from "axios";
+import * as THREE from "three";
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -34,6 +10,65 @@ export default function SignIn() {
     password: "",
     rememberMe: false,
   });
+
+  const canvasRef = React.useRef(null);
+
+  React.useEffect(() => {
+    // Setup Three.js scene for the starry background
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // Create stars in the background
+    const starGeometry = new THREE.BufferGeometry();
+    const starCount = 5000;
+    const starVertices = [];
+    for (let i = 0; i < starCount; i++) {
+      const x = THREE.MathUtils.randFloatSpread(2000);
+      const y = THREE.MathUtils.randFloatSpread(2000);
+      const z = THREE.MathUtils.randFloatSpread(2000);
+      starVertices.push(x, y, z);
+    }
+
+    starGeometry.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(starVertices, 3)
+    );
+
+    const starMaterial = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.5,
+    });
+
+    const stars = new THREE.Points(starGeometry, starMaterial);
+    scene.add(stars);
+
+    camera.position.z = 1;
+
+    const animate = function () {
+      requestAnimationFrame(animate);
+      stars.rotation.x += 0.0005;
+      stars.rotation.y += 0.0005;
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+    // Handle resize
+    const handleResize = () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleChange = (e) => {
     const value =
@@ -60,122 +95,108 @@ export default function SignIn() {
     }
   };
 
+  // Function to navigate to the home page when clicking the logo
+  const handleLogoClick = () => {
+    navigate("/");
+  };
+
   return (
-    <ThemeProvider theme={darkTheme}>
-      <Grid container component="main" sx={{ height: "100vh" }}>
-        <CssBaseline />
-        {/* Left Section for Planet */}
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
-          sx={{
-            position: "relative",
-            backgroundColor: "#0a0a0a",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          {/* Render the Earth model in the background */}
-          <EarthSignIn />
-        </Grid>
+    <div className="relative h-screen w-full overflow-hidden bg-gray-900">
+      <canvas ref={canvasRef} className="absolute inset-0 z-0" />
+      <div className="relative z-10 flex h-full">
+        {/* Left Section for Planet (replacing EarthSignIn component with a starry background) */}
+        <div className="hidden md:flex md:w-1/2 items-center justify-center">
+          {/* Starry background handled by Three.js */}
+        </div>
 
         {/* Right Section for Sign-in Form */}
-        <Grid
-          item
-          xs={12}
-          sm={8}
-          md={5}
-          component={Box}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center", // Center content vertically
-            alignItems: "center",
-            backgroundColor: "background.paper",
-          }}
-        >
-          <Box
-            sx={{
-              mx: 4,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
+        <div className="flex flex-col justify-center items-center w-full md:w-1/2 bg-gray-800 p-8">
+          <div className="w-full max-w-md">
             {/* Add Planetary Capital logo above the "Sign in" text */}
-            <Link href="/" variant="body2">
+            <div className="flex justify-center mb-6">
               <img
                 src="/Planetary Capital.png"
                 alt="Planetary Capital Logo"
-                style={{ width: 80, height: 80, marginBottom: "16px" }}
+                className="w-20 h-20 cursor-pointer"
+                onClick={handleLogoClick}
               />
-            </Link>
-            <Typography component="h1" variant="h5">
-              Sign in
-            </Typography>
+            </div>
+            <h2 className="text-center text-2xl font-bold text-white mb-6">
+              Sign In
+            </h2>
 
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                autoFocus
-                value={formData.email}
-                onChange={handleChange}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    name="rememberMe"
-                    checked={formData.rememberMe}
-                    onChange={handleChange}
-                  />
-                }
-                label="Remember me"
-              />
-              <Button
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-200"
+                >
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-200"
+                >
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div className="flex items-center">
+                <input
+                  id="rememberMe"
+                  name="rememberMe"
+                  type="checkbox"
+                  checked={formData.rememberMe}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                />
+                <label
+                  htmlFor="rememberMe"
+                  className="ml-2 block text-sm text-gray-200"
+                >
+                  Remember me
+                </label>
+              </div>
+              <button
                 type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+                className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 Sign In
-              </Button>
-              <Grid container>
-                <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Grid>
-                <Grid item>
-                  <Link href="/signup" variant="body2">
-                    {"Don't have an account? Sign Up"}
-                  </Link>
-                </Grid>
-              </Grid>
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
-    </ThemeProvider>
+              </button>
+              <div className="flex justify-between mt-4">
+                <a href="#" className="text-sm text-indigo-600 hover:underline">
+                  Forgot password?
+                </a>
+                <a
+                  href="/signup"
+                  className="text-sm text-indigo-600 hover:underline"
+                >
+                  Don't have an account? Sign Up
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
