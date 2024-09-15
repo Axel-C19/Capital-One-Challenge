@@ -9,7 +9,7 @@ const Home = () => {
   return (
     <>
       <h1>Home/FEED</h1>
-      <Earth />
+      <Asteroid />
       <Link to="/">
         <button>Go to landing</button>
       </Link>
