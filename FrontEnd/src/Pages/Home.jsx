@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DestroyedPlanet from "../Components/threeJsComponents/destroyedPlanet";
 import Earth from "../Components/threeJsComponents/earth";
+import Asteroid from "../Components/threeJsComponents/asteroid";
 import IncomPlanet from "../Components/threeJsComponents/incomPlanet";
 import Planetoid from "../Components/threeJsComponents/planetoid";
 import Navbar from "../Components/NavBar";
@@ -36,11 +37,11 @@ const Home = () => {
     const { progress } = userData; // Assuming progress is stored in userData
 
     if (progress <= 25) {
-      return <DestroyedPlanet />;
+      return <Asteroid />;
     } else if (progress > 25 && progress <= 50) {
-      return <IncomPlanet />;
-    } else if (progress > 50 && progress <= 75) {
       return <Planetoid />;
+    } else if (progress > 50 && progress <= 75) {
+      return <IncomPlanet />;
     } else {
       return <Earth />;
     }
