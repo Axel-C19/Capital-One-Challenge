@@ -1,18 +1,21 @@
-import * as React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import * as THREE from "three";
 
-export default function SignUp() {
+const SignUp = () => {
   const navigate = useNavigate();
-  const canvasRef = React.useRef(null);
-  const [formData, setFormData] = React.useState({
+  const canvasRef = useRef(null);
+  const [formData, setFormData] = useState({
     fullName: "",
+    username: "",
     email: "",
     password: "",
+    phone_number: "",
+    age: "",
+    account_number: "",
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Setup Three.js scene
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
@@ -77,25 +80,40 @@ export default function SignUp() {
     });
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/signup",
-        formData
-      );
-      if (response.status === 201) {
+      const response = await fetch("http://localhost:5000/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password_hash: formData.password,
+          phone_number: formData.phone_number,
+          age: formData.age,
+          bank_account: {
+            account_number: formData.account_number,
+          },
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert("User created successfully");
         navigate("/Home");
+      } else {
+        const errorData = await response.json();
+        console.error("Error:", errorData);
+        alert("Error creating user");
       }
     } catch (error) {
-      console.error(
-        "Error during signup",
-        error.response?.data?.message || error.message
-      );
+      console.error("Error:", error);
     }
   };
 
-  // Function to navigate to the home page when clicking the logo
   const handleLogoClick = () => {
     navigate("/");
   };
@@ -119,17 +137,17 @@ export default function SignUp() {
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label
-                htmlFor="fullName"
+                htmlFor="username"
                 className="block text-sm font-medium text-gray-700"
               >
-                Full Name
+                Username
               </label>
               <input
-                id="fullName"
-                name="fullName"
+                id="username"
+                name="username"
                 type="text"
                 required
-                value={formData.fullName}
+                value={formData.username}
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
@@ -168,23 +186,76 @@ export default function SignUp() {
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
+            <div>
+              <label
+                htmlFor="phone_number"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Phone Number
+              </label>
+              <input
+                id="phone_number"
+                name="phone_number"
+                type="text"
+                required
+                value={formData.phone_number}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="age"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Age
+              </label>
+              <input
+                id="age"
+                name="age"
+                type="number"
+                required
+                value={formData.age}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="account_number"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Bank Account Number
+              </label>
+              <input
+                id="account_number"
+                name="account_number"
+                type="text"
+                required
+                value={formData.account_number}
+                onChange={handleChange}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
             <button
               type="submit"
               className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               Sign Up
             </button>
-            <div className="text-center mt-4">
-              <a
-                href="/SignIn"
-                className="text-sm text-indigo-600 hover:underline"
-              >
-                Already have an account? Sign in
-              </a>
-            </div>
           </form>
+          <div className="text-center mt-4">
+            <a
+              href="/SignIn"
+              className="text-sm text-indigo-600 hover:underline"
+            >
+              Already have an account? Sign in
+            </a>
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default SignUp;

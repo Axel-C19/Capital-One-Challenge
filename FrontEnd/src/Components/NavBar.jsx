@@ -24,8 +24,11 @@ const Navbar = () => {
           </div>
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              <NavButton text="My Goals" />
+              <Link href="/Dashboard">
+                <NavButton text="My Goals" />
+              </Link>
               <NavButton text="My planetary system" />
+
               <NavButton text="Friends" />
               <NavButton text="My Stats" />
               <NavButton text="Learn More" />

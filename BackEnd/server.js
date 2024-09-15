@@ -14,12 +14,7 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 // Rutas
-app.use("/api/auth", authRoutes); // Agregamos las rutas de autenticación
-
-// Ruta de ejemplo
-app.get("/", (req, res) => {
-  res.send("Hello from the backend!");
-});
+app.use("/api", authRoutes); // Agregamos las rutas de autenticación
 
 // Iniciar el servidor
 app.listen(PORT, () => {

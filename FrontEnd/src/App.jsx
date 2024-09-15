@@ -4,6 +4,7 @@ import SignIn from "./Pages/SignIn";
 import Home from "./Pages/Home";
 import LandingPage from "./Pages/LandingPage";
 import NotFound from "./Pages/notFound";
+import Dashboard from "./Pages/PlanetaryDashboard";
 import AboutUsPage from "./Pages/AboutUs";
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/SignIn" element={<SignIn />} />
+        <Route path="/Dashboard" element={<Dashboard />} />
         <Route path="/Home" element={<Home />} />
         <Route path="/AboutUs" element={<AboutUsPage />} />
         <Route path="*" element={<NotFound />} />

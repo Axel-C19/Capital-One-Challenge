@@ -32,13 +32,14 @@ const Asteroid = () => {
     pointLight.position.set(-5, 5, 5);
     scene.add(pointLight);
 
-    // Load the GLB model (Planet.glb)
+    // Load the GLB model (Asteroid.glb)
     const loader = new GLTFLoader();
     let planet;
     loader.load(
       "/Asteroid.glb",
       (gltf) => {
         planet = gltf.scene;
+        planet.scale.set(0.05, 0.05, 0.05); // Much smaller scale for asteroid
         scene.add(planet);
       },
       undefined,

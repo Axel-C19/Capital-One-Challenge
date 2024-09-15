@@ -1,20 +1,20 @@
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
+// Middleware para proteger rutas
 const auth = (req, res, next) => {
-  const token = req.header("x-auth-token"); // Leer el token del encabezado
+  const token = req.header("Authorization");
 
   if (!token) {
-    return res
-      .status(401)
-      .json({ message: "No se ha proporcionado un token." });
+    return res.status(401).json({ message: "No token, authorization denied" });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verificar el token
-    req.user = decoded; // Guardar los datos del usuario decodificados en req.user
-    next(); // Pasar al siguiente middleware o controlador
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Usar el JWT_SECRET de .env
+    req.user = decoded.userId; // Asumimos que el token tiene userId
+    next();
   } catch (error) {
-    res.status(400).json({ message: "Token inválido." });
+    res.status(401).json({ message: "Invalid token" });
   }
 };
 

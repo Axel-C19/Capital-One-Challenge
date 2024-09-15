@@ -11,6 +11,8 @@ export default function SignIn() {
     rememberMe: false,
   });
 
+  const [errorMessage, setErrorMessage] = React.useState("");
+
   const canvasRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -83,36 +85,38 @@ export default function SignIn() {
     event.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "http://localhost:5000/api/login",
         formData
       );
+
       if (response.status === 200) {
-        localStorage.setItem("token", response.data.token);
-        navigate("/home");
+        localStorage.setItem("token", response.data.token); // Guardar el token
+        navigate("/Home"); // Redirigir al home
+      } else {
+        setErrorMessage("Login failed. Please try again.");
       }
     } catch (error) {
-      console.error("Error during login:", error);
+      if (error.response && error.response.status === 400) {
+        setErrorMessage("Invalid email or password. Please try again.");
+      } else {
+        setErrorMessage("Server error. Please try again later.");
+      }
     }
   };
 
   // Function to navigate to the home page when clicking the logo
   const handleLogoClick = () => {
-    navigate("/");
+    navigate("/Home");
   };
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-gray-900">
       <canvas ref={canvasRef} className="absolute inset-0 z-0" />
       <div className="relative z-10 flex h-full">
-        {/* Left Section for Planet (replacing EarthSignIn component with a starry background) */}
-        <div className="hidden md:flex md:w-1/2 items-center justify-center">
-          {/* Starry background handled by Three.js */}
-        </div>
+        <div className="hidden md:flex md:w-1/2 items-center justify-center"></div>
 
-        {/* Right Section for Sign-in Form */}
         <div className="flex flex-col justify-center items-center w-full md:w-1/2 bg-gray-800 p-8">
           <div className="w-full max-w-md">
-            {/* Add Planetary Capital logo above the "Sign in" text */}
             <div className="flex justify-center mb-6">
               <img
                 src="/Planetary Capital.png"
@@ -124,6 +128,12 @@ export default function SignIn() {
             <h2 className="text-center text-2xl font-bold text-white mb-6">
               Sign In
             </h2>
+
+            {errorMessage && (
+              <div className="text-red-500 text-center mb-4">
+                {errorMessage}
+              </div>
+            )}
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>

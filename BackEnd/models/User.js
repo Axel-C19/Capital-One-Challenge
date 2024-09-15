@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   phone_number: { type: String, required: true },
   bank_account: {
     account_number: { type: String, required: true },
-    balance: { type: Number, default: 0 },
+    balance: { type: Number, default: 2000 },
     transactions: [
       {
         transaction_id: String,

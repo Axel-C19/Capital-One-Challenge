@@ -36,7 +36,7 @@ const Planetoid = () => {
     const loader = new GLTFLoader();
     let planet;
     loader.load(
-      "/Planetoid.glb",
+      "/planetoid.glb",
       (gltf) => {
         planet = gltf.scene;
         scene.add(planet);

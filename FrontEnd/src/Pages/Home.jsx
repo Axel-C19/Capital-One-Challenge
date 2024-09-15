@@ -4,11 +4,12 @@ import Earth from "../Components/threeJsComponents/earth";
 import IncomPlanet from "../Components/threeJsComponents/incomPlanet";
 import Planetoid from "../Components/threeJsComponents/planetoid";
 import Asteroid from "../Components/threeJsComponents/Asteroid";
+import Navbar from "../Components/NavBar";
 
 const Home = () => {
   return (
     <>
-      <h1>Home/FEED</h1>
+      <Navbar />
       <Asteroid />
       <Link to="/">
         <button>Go to landing</button>
