@@ -106,7 +106,7 @@ export default function SignIn() {
 
   // Function to navigate to the home page when clicking the logo
   const handleLogoClick = () => {
-    navigate("/Home");
+    navigate("/");
   };
 
   return (

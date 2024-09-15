@@ -132,7 +132,7 @@ const SignUp = () => {
             />
           </div>
           <h2 className="text-center text-2xl font-bold text-gray-800 my-4">
-            Sign Up
+            Register
           </h2>
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div>

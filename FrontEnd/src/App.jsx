@@ -6,6 +6,8 @@ import LandingPage from "./Pages/LandingPage";
 import NotFound from "./Pages/notFound";
 import Dashboard from "./Pages/PlanetaryDashboard";
 import AboutUsPage from "./Pages/AboutUs";
+import SolarSystem from "./Components/threeJsComponents/solarSystem";
+import ProtectedRoute from "./Components/protectedRoute";
 
 function App() {
   return (
@@ -14,8 +16,30 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/SignIn" element={<SignIn />} />
-        <Route path="/Dashboard" element={<Dashboard />} />
-        <Route path="/Home" element={<Home />} />
+        <Route
+          path="/Dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/SolarSystem"
+          element={
+            <ProtectedRoute>
+              <SolarSystem />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Home"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/AboutUs" element={<AboutUsPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

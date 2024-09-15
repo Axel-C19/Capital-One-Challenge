@@ -62,6 +62,21 @@ router.get("/protected", auth, (req, res) => {
   res.json({ message: "This is a protected route", userId: req.user });
 });
 
+router.get("/user", auth, async (req, res) => {
+  try {
+    // req.user is set in the auth middleware, which is the userId from the token
+    const user = await User.findById(req.user).select("-password"); // Exclude the password
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user); // Send the user data back to the frontend
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 // User profile
 
 module.exports = router;
