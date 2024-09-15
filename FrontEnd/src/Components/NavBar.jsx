@@ -38,7 +38,9 @@ const Navbar = () => {
               <Link href="/SolarSystem">
                 <NavButton text="My planetary system" />
               </Link>
-              <NavButton text="Friends" />
+              <Link href="/Friends">
+                <NavButton text="Friends" />
+              </Link>
               <NavButton text="My Stats" />
               <Link href="/AboutUs">
                 <NavButton text="Learn More" />

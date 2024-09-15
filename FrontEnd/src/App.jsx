@@ -8,6 +8,7 @@ import Dashboard from "./Pages/PlanetaryDashboard";
 import AboutUsPage from "./Pages/AboutUs";
 import SolarSystem from "./Components/threeJsComponents/solarSystem";
 import ProtectedRoute from "./Components/protectedRoute";
+import Friends from "./Pages/Friends";
 
 function App() {
   return (
@@ -21,6 +22,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Friends"
+          element={
+            <ProtectedRoute>
+              <Friends />
             </ProtectedRoute>
           }
         />
